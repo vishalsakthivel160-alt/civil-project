@@ -3,104 +3,62 @@ import { MapPin, Calendar, Layers, Eye, RefreshCw, AlertCircle, ArrowUpRight } f
 import { Project } from '../api/client.js';
 
 interface ProjectsSectionProps {
+  id: string;
+  title: string;
+  subtitle: string;
+  sectionNumber: string;
+  badgeDotColor?: string;
   projects: Project[];
   loading: boolean;
   error: string | null;
   onSelectProject: (project: Project) => void;
   onRetry: () => void;
+  emptyMessage: string;
 }
 
 const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1541888946425-d0fbb1861593?q=80&w=1200&auto=format&fit=crop';
 
 export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
+  id,
+  title,
+  subtitle,
+  sectionNumber,
+  badgeDotColor = 'bg-[#B87333]',
   projects,
   loading,
   error,
   onSelectProject,
   onRetry,
+  emptyMessage,
 }) => {
-  const [activeTab, setActiveTab] = useState<'completed' | 'ongoing'>('completed');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
 
-  const completedProjects = projects.filter((p) => p.status === 'Completed');
-  const ongoingProjects = projects.filter((p) => p.status === 'Ongoing');
-
-  const currentList = activeTab === 'completed' ? completedProjects : ongoingProjects;
-
-  // Extract unique categories for current tab
-  const categories = ['All', ...Array.from(new Set(currentList.map((p) => p.category)))];
+  // Extract unique categories for current list
+  const categories = ['All', ...Array.from(new Set(projects.map((p) => p.category)))];
 
   const filteredProjects = selectedCategory === 'All'
-    ? currentList
-    : currentList.filter((p) => p.category === selectedCategory);
+    ? projects
+    : projects.filter((p) => p.category === selectedCategory);
 
   return (
-    <section id="projects" className="py-20 bg-white border-b border-[#E2E8F0]">
+    <section id={id} className="py-20 bg-white border-b border-[#E2E8F0]">
       <div className="max-w-7xl mx-auto px-4 sm:px-8">
         
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-10 border-b border-[#E2E8F0]">
           <div>
             <div className="inline-flex items-center gap-2 mb-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#B87333]"></span>
+              <span className={`w-1.5 h-1.5 rounded-full ${badgeDotColor}`}></span>
               <span className="subheading-tracked text-[#66737D]">
-                SECTION 02 // PORTFOLIO DOSSIER
+                SECTION {sectionNumber} // PORTFOLIO DOSSIER
               </span>
             </div>
             <h2 className="font-display text-3xl sm:text-4xl font-semibold text-[#102230] tracking-tight">
-              Civil Works & Structural Projects
+              {title}
             </h2>
             <p className="font-body text-[#43474c] text-sm sm:text-base mt-2 max-w-xl">
-              Comprehensive showcase of past executions and active worksites. Filtered dynamically by execution status and engineering typology.
+              {subtitle}
             </p>
-          </div>
-
-          {/* Master Status Switcher: Completed vs Ongoing */}
-          <div className="flex items-center p-1 bg-[#F3F5F7] rounded border border-[#E2E8F0] self-start md:self-auto">
-            <button
-              id="projects-completed"
-              onClick={() => {
-                setActiveTab('completed');
-                setSelectedCategory('All');
-              }}
-              className={`px-4 py-2 rounded text-xs font-display font-semibold transition-all flex items-center gap-2 cursor-pointer ${
-                activeTab === 'completed'
-                  ? 'bg-[#263746] text-white shadow-xs'
-                  : 'text-[#43474c] hover:text-[#102230]'
-              }`}
-            >
-              <span>Completed Works</span>
-              <span
-                className={`text-[10px] px-1.5 py-0.2 rounded font-mono ${
-                  activeTab === 'completed' ? 'bg-[#102230] text-[#d2e4f8]' : 'bg-[#E2E8F0] text-[#66737D]'
-                }`}
-              >
-                {completedProjects.length}
-              </span>
-            </button>
-
-            <button
-              id="projects-ongoing"
-              onClick={() => {
-                setActiveTab('ongoing');
-                setSelectedCategory('All');
-              }}
-              className={`px-4 py-2 rounded text-xs font-display font-semibold transition-all flex items-center gap-2 cursor-pointer ${
-                activeTab === 'ongoing'
-                  ? 'bg-[#B87333] text-white shadow-xs'
-                  : 'text-[#43474c] hover:text-[#102230]'
-              }`}
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-200 animate-pulse"></span>
-              <span>Ongoing Works</span>
-              <span
-                className={`text-[10px] px-1.5 py-0.2 rounded font-mono ${
-                  activeTab === 'ongoing' ? 'bg-[#8c4f10] text-[#ffdcc2]' : 'bg-[#E2E8F0] text-[#66737D]'
-                }`}
-              >
-                {ongoingProjects.length}
-              </span>
-            </button>
           </div>
         </div>
 
@@ -155,14 +113,24 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
         )}
 
         {/* Empty State */}
-        {!loading && !error && filteredProjects.length === 0 && (
+        {!loading && !error && projects.length === 0 && (
+          <div className="py-20 border border-[#E2E8F0] bg-[#F3F5F7]/40 rounded text-center my-8 p-10 space-y-3">
+            <div className="w-10 h-10 rounded bg-white border border-[#E2E8F0] flex items-center justify-center mx-auto text-[#66737D]">
+              <Layers className="w-5 h-5" />
+            </div>
+            <h4 className="font-display font-semibold text-base text-[#102230]">{emptyMessage}</h4>
+          </div>
+        )}
+
+        {/* Empty Category State */}
+        {!loading && !error && projects.length > 0 && filteredProjects.length === 0 && (
           <div className="py-20 border border-[#E2E8F0] bg-[#F3F5F7]/40 rounded text-center my-8 p-10 space-y-3">
             <div className="w-10 h-10 rounded bg-white border border-[#E2E8F0] flex items-center justify-center mx-auto text-[#66737D]">
               <Layers className="w-5 h-5" />
             </div>
             <h4 className="font-display font-semibold text-base text-[#102230]">No Projects Found in this Category</h4>
             <p className="text-xs text-[#66737D]">
-              No active entries match {selectedCategory !== 'All' ? `"${selectedCategory}"` : 'the filter'}. Try switching categories.
+              No active entries match "{selectedCategory}". Try switching categories.
             </p>
           </div>
         )}

@@ -66,6 +66,9 @@ export default function App() {
     loadData();
   }, [loadData]);
 
+  const completedProjects = projects.filter((p) => p.status === 'Completed');
+  const ongoingProjects = projects.filter((p) => p.status === 'Ongoing');
+
   // Smooth scroll helper
   const handleNavigate = (sectionId: string) => {
     const el = document.getElementById(sectionId);
@@ -88,13 +91,34 @@ export default function App() {
           onContactClick={() => handleNavigate('contact')}
         />
 
-        {/* Projects Section (Completed & Ongoing) */}
+        {/* Completed Works Section */}
         <ProjectsSection
-          projects={projects}
+          id="projects-completed"
+          title="Completed Works"
+          subtitle="Comprehensive showcase of successfully executed projects and architectural accomplishments."
+          sectionNumber="02"
+          badgeDotColor="bg-[#263746]"
+          projects={completedProjects}
           loading={loadingProjects}
           error={projectError}
           onSelectProject={(project) => setSelectedProject(project)}
           onRetry={loadData}
+          emptyMessage="No completed projects available yet."
+        />
+
+        {/* Ongoing Sites Section */}
+        <ProjectsSection
+          id="projects-ongoing"
+          title="Ongoing Sites (Live)"
+          subtitle="Currently active construction projects and sites currently undergoing execution."
+          sectionNumber="02"
+          badgeDotColor="bg-[#B87333] animate-pulse"
+          projects={ongoingProjects}
+          loading={loadingProjects}
+          error={projectError}
+          onSelectProject={(project) => setSelectedProject(project)}
+          onRetry={loadData}
+          emptyMessage="No ongoing projects available right now."
         />
 
         {/* Services & Capabilities */}
