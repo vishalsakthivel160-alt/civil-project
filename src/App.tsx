@@ -13,6 +13,7 @@ import { ProjectsSection } from './components/ProjectsSection.js';
 import { ProjectModal } from './components/ProjectModal.js';
 import { ServicesSection } from './components/ServicesSection.js';
 import { ExperienceSection } from './components/ExperienceSection.js';
+import { FounderProfile } from './components/FounderProfile.js';
 import { ContactSection } from './components/ContactSection.js';
 import { Footer } from './components/Footer.js';
 
@@ -130,6 +131,9 @@ export default function App() {
 
         {/* Professional Work Experience */}
         <ExperienceSection />
+
+        {/* Founder Profile */}
+        <FounderProfile />
 
         {/* Contact & Tender Inquiry Form */}
         <ContactSection settings={settings} />
