@@ -4,11 +4,10 @@ import { SiteSettings } from '../api/client.js';
 
 interface HeroProps {
   settings: SiteSettings | null;
-  onExploreProjects: () => void;
   onContactClick: () => void;
 }
 
-export const Hero: React.FC<HeroProps> = ({ settings, onExploreProjects, onContactClick }) => {
+export const Hero: React.FC<HeroProps> = ({ settings, onContactClick }) => {
   return (
     <section id="hero" className="relative bg-[#f7f9ff] border-b border-[#E2E8F0] overflow-hidden">
       {/* Drafting grid background */}
@@ -38,13 +37,6 @@ export const Hero: React.FC<HeroProps> = ({ settings, onExploreProjects, onConta
 
             {/* CTAs */}
             <div className="flex flex-wrap items-center gap-4 pt-2">
-              <button
-                onClick={onExploreProjects}
-                className="px-6 py-3.5 rounded bg-[#263746] text-white hover:bg-[#102230] font-display text-sm font-semibold tracking-wider uppercase transition-all duration-150 border border-[#102230] elevation-level-2 flex items-center gap-2 group cursor-pointer"
-              >
-                <span>Explore Project Portfolio</span>
-                <ArrowRight className="w-4 h-4 text-[#fdad67] group-hover:translate-x-1 transition-transform" />
-              </button>
               <button
                 onClick={onContactClick}
                 className="px-6 py-3.5 rounded bg-white text-[#1F2933] hover:bg-[#F3F5F7] font-display text-sm font-semibold tracking-wider uppercase transition-all duration-150 border border-[#E2E8F0] flex items-center gap-2 cursor-pointer"

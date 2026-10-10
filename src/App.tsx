@@ -88,7 +88,6 @@ export default function App() {
         {/* Hero Section */}
         <Hero
           settings={settings}
-          onExploreProjects={() => handleNavigate('projects')}
           onContactClick={() => handleNavigate('contact')}
         />
 
