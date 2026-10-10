@@ -47,7 +47,17 @@ export interface ApiResponse<T> {
   error?: string;
 }
 
-const API_BASE = '/api';
+const API_BASE = import.meta.env.VITE_API_URL || '/api';
+
+async function parseResponse<T>(res: Response): Promise<T> {
+  const contentType = res.headers.get('content-type');
+  if (!contentType || !contentType.includes('application/json')) {
+    const text = await res.text();
+    console.error('API Error: Expected JSON, got:', text.substring(0, 100));
+    throw new Error('API request failed: Server returned an invalid or non-JSON response.');
+  }
+  return res.json();
+}
 
 export async function fetchProjects(filter?: { status?: string; category?: string }): Promise<Project[]> {
   const params = new URLSearchParams();
@@ -56,7 +66,7 @@ export async function fetchProjects(filter?: { status?: string; category?: strin
 
   const url = `${API_BASE}/projects${params.toString() ? `?${params.toString()}` : ''}`;
   const res = await fetch(url);
-  const data: ApiResponse<Project[]> = await res.json();
+  const data: ApiResponse<Project[]> = await parseResponse(res);
   if (!res.ok || !data.success) {
     throw new Error(data.error || 'Failed to fetch projects');
   }
@@ -65,7 +75,7 @@ export async function fetchProjects(filter?: { status?: string; category?: strin
 
 export async function fetchProjectById(id: string): Promise<Project> {
   const res = await fetch(`${API_BASE}/projects/${id}`);
-  const data: ApiResponse<Project> = await res.json();
+  const data: ApiResponse<Project> = await parseResponse(res);
   if (!res.ok || !data.success) {
     throw new Error(data.error || `Failed to fetch project ${id}`);
   }
@@ -74,7 +84,7 @@ export async function fetchProjectById(id: string): Promise<Project> {
 
 export async function fetchServices(): Promise<Service[]> {
   const res = await fetch(`${API_BASE}/services`);
-  const data: ApiResponse<Service[]> = await res.json();
+  const data: ApiResponse<Service[]> = await parseResponse(res);
   if (!res.ok || !data.success) {
     throw new Error(data.error || 'Failed to fetch services');
   }
@@ -83,7 +93,7 @@ export async function fetchServices(): Promise<Service[]> {
 
 export async function fetchSiteSettings(): Promise<SiteSettings> {
   const res = await fetch(`${API_BASE}/settings`);
-  const data: ApiResponse<SiteSettings> = await res.json();
+  const data: ApiResponse<SiteSettings> = await parseResponse(res);
   if (!res.ok || !data.success) {
     throw new Error(data.error || 'Failed to fetch site settings');
   }
@@ -99,7 +109,7 @@ export async function submitContact(form: ContactSubmission): Promise<{ success:
     body: JSON.stringify(form),
   });
 
-  const data = await res.json();
+  const data: ApiResponse<any> = await parseResponse(res);
   if (!res.ok || !data.success) {
     throw new Error(data.error || 'Failed to submit contact message');
   }
